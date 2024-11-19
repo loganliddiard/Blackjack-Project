@@ -1,12 +1,12 @@
+## custom player object
 
 
+class CustomPlaystyle:
 
-
-class Classic_Playstyle:
-
-    def __init__(self,minVal):
+    def __init__(self,minVal=17,dealerVal=0,bet_range=0):
         self.hit = 1
         self.stay = 0
+        self
 
         self.hitWhenBelow = minVal
 
