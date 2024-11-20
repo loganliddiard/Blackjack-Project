@@ -1,5 +1,6 @@
 import blackjack
 import strategy
+import optimal_playstyle
 
 import matplotlib.pyplot as plt
 
@@ -69,7 +70,7 @@ def optimal_leave(game, player, rounds=1_000):
     plt.title("Optimal Stopping Simulation for Blackjack")
     plt.legend()
     plt.grid(True)
-    plt.show()
+    plt.savefig(f"{player.player}_optimal_leave.png")
 
 
 
@@ -81,6 +82,10 @@ def run_optimalstop():
     #optimal_hit(game)
 
     player = strategy.CustomPlaystyle(15)
+    optimal_leave(game,player)
+    #game = blackjack.BlackJackGame(False)
+    print("Using optimal player...")
+    player = optimal_playstyle.OptimalPlayer()
     optimal_leave(game,player)
 
 

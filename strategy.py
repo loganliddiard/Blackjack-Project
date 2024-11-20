@@ -4,9 +4,11 @@
 class CustomPlaystyle:
 
     def __init__(self,minVal=17,dealerVal=0,bet_range=0):
+
+        self.player = "simple"
+
         self.hit = 1
         self.stay = 0
-        self
 
         self.hitWhenBelow = minVal
 

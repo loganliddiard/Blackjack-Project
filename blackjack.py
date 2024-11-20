@@ -50,7 +50,8 @@ class BlackJackGame:
             
             ##action = input("Would you like to (h)it or (s)tand? ").lower()
             
-            action = player.get_action(self.calculate_hand(player_hand),self.calculate_hand(dealer_hand),bet)
+            
+            action = player.get_action(self.calculate_hand(player_hand),self.values[dealer_hand[1][0]],bet)
             if action == 1:
                 player_hand.append(deck.pop())
             elif action == 0:
