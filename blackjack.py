@@ -2,9 +2,10 @@ import random
 
 
 class BlackJackGame:
-    def __init__(self,mute):
+    def __init__(self,mute, num_decks=1):
 
         # Deck of cards
+        self.deckCount = num_decks
         self.mute = mute
         self.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades']
         self.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
@@ -12,7 +13,7 @@ class BlackJackGame:
 
     # Create a deck
     def create_deck(self):
-        deck = [(rank, suit) for suit in self.suits for rank in self.ranks]
+        deck = [(rank, suit) for suit in self.suits for rank in self.ranks] * self.deckCount
         random.shuffle(deck)
         return deck
 
