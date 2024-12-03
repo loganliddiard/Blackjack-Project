@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 def optimal_hit(game):
     print("Running simulation to find point to stop hitting...")
     results=0
-    rounds = 1_000_000
+    rounds = 100_000
     max_win_streak = 0
     win_counts = []
 
@@ -34,7 +34,7 @@ def optimal_hit(game):
 
     # Plot the data
     plt.plot(win_counts)
-    plt.show()
+    plt.savefig(f"{player.player}_optimal_stophit.png")
 
 
     print(f"Here are the results after {rounds} rounds: {results}")
@@ -79,7 +79,7 @@ def run_optimalstop():
     mute = True
     game = blackjack.BlackJackGame(mute)
 
-    #optimal_hit(game)
+    optimal_hit(game)
 
     player = strategy.CustomPlaystyle(15)
     optimal_leave(game,player)
