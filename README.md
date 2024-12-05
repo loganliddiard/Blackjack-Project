@@ -10,7 +10,7 @@
 This project focuses on applying the algorithms focusing on uncertainty across the game Blackjack scenarios. There were three main parts:
 
 1. Exploring the use of optimal stopping algorithms in blackjack
-2. Determining if epsilon-greedy algorithm can find the optimal table to play at
+2. Determining if the epsilon-greedy and thompson sampling algorithm can find the optimal table to play at (with different #decks)
 3. Seeing if reinforcement learning algorithms can find improved strategies
 
 ## Requirements:
@@ -77,3 +77,7 @@ We also plotted each deck's results using their individually best strategies. Th
 <p align="center">
   <img src="figures/best_performing_strategy.png" alt="deck convergence's best strats">
 </p>
+
+### How many decks is most profitable? Which strategy for exploring is best?
+
+The results are all very close, but it seems like using 1 deck may just barely be more profitable overall. This could just be a skew, we may find different results from running for more iterations. The best strategy seems to be thompson sampling, it takes longer to converge, but typically seems to converge at a slightly higher win rate.
