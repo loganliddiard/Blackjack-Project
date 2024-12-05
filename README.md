@@ -52,4 +52,28 @@ Across different runs of this algorithm the common theme amongst them is to stop
   <img src="figures/simple_optimal_leave.png" alt="optimal_leave">
 </p>
 
+### Which table is the best? Do different amounts of decks matter?
 
+We used Thompson sampling and an epsilon greedy algorithm to explore tables with different amounts of decks. We tested epsilon values of [0.01, 0.05, 0.1, 0.4], and deck sizes of [1, 2, 4, 6, 8]. We let it run for 1000 epsiodes/games, and then averaged the results over 100 iterations.
+
+<p align="center">
+  <img src="figures/comparison_strategies.png" alt="comparing_all_strats">
+</p>
+
+Every epsilon value/thompson sampling and deck combination converged in similar amounts of time (at first glance at least, this deviates when we average the technique's results) and to very similar win ratios. There is about a ~2% spread in win ratios in all of the deck and technique combinations.
+
+<p align="center">
+  <img src="figures/overall_strategy_convergence.png" alt="strategy convergence">
+</p>
+
+We averaged out the win rates for each epsilon value and for thompson sampling, and its clear that thompson sampling took the longest to converge, but overall probably had the best win rate by a thin margin, edged out slightly by e=.05 at the end. There were slight variations in the convergences for epsilons. Epsilon of .05 took the longest to converge, and the epsilon of .4 was the shortest. After converging, the values all were less than 1% total win ratio different than eachother. 
+
+<p align="center">
+  <img src="figures/overall_deck_convergence.png" alt="deck convergence">
+</p>
+
+We also plotted each deck's results using their individually best strategies. There was slightly more spread in these results than by comparing the different techniques in exploring. Using 1 deck took the longest to converge, possibly because running without immediate replacement has more of an effect when less cards are in total circulation. In our results there was a total spread of ~1% of total win ratio. The best deck amount with it's best strategy for exploring seems to just barely be 1 deck. This best strategy seemed to be thompson sampling as shown: 
+
+<p align="center">
+  <img src="figures/best_performing_strategy.png" alt="deck convergence's best strats">
+</p>
