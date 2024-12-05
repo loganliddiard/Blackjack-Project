@@ -54,30 +54,20 @@ Across different runs of this algorithm the common theme amongst them is to stop
 
 ### Which table is the best? Do different amounts of decks matter?
 
-We used Thompson sampling and an epsilon greedy algorithm to explore tables with different amounts of decks. We tested epsilon values of [0.01, 0.05, 0.1, 0.4], and deck sizes of [1, 2, 4, 6, 8]. We let it run for 1000 epsiodes/games, and then averaged the results over 100 iterations.
+We used Thompson sampling and an epsilon greedy algorithm to explore tables with different amounts of decks. We tested epsilon values of [0.01, 0.05, 0.1, 0.4], and deck sizes of [1, 2, 4, 6, 8]. We let it run for 1000 episodes/games, and then averaged the results over 1000 iterations.
 
 <p align="center">
-  <img src="figures/comparison_strategies.png" alt="comparing_all_strats">
+  <img src="figures/overall_performance.png" alt="comparing_all_strats">
 </p>
 
-Every epsilon value/thompson sampling and deck combination converged in similar amounts of time (at first glance at least, this deviates when we average the technique's results) and to very similar win ratios. There is about a ~2% spread in win ratios in all of the deck and technique combinations.
+Every epsilon value/thompson sampling and deck combination converged in similar amounts of time and to very similar win ratios. Thompson sampling seems to have converged the fastest. There is about a ~0.5% spread in win ratios in all of the deck and technique combinations. Our plot indicates that the epsilon of 0.4 seems to have the highest converged win ratio, whole e=0.1 was the lowest. thompson sampling did the same as e=.05 & e=.1. However, most if not all of this variability could be explained by not running enough iterations, but it would take a very long time to run significantly higher amounts.
 
 <p align="center">
-  <img src="figures/overall_strategy_convergence.png" alt="strategy convergence">
+  <img src="figures/deck_performance.png" alt="strategy convergence">
 </p>
 
-We averaged out the win rates for each epsilon value and for thompson sampling, and its clear that thompson sampling took the longest to converge, but overall probably had the best win rate by a thin margin, edged out slightly by e=.05 at the end. There were slight variations in the convergences for epsilons. Epsilon of .05 took the longest to converge, and the epsilon of .4 was the shortest. After converging, the values all were less than 1% total win ratio different than eachother. 
-
-<p align="center">
-  <img src="figures/overall_deck_convergence.png" alt="deck convergence">
-</p>
-
-We also plotted each deck's results using their individually best strategies. There was slightly more spread in these results than by comparing the different techniques in exploring. Using 1 deck took the longest to converge, possibly because running without immediate replacement has more of an effect when less cards are in total circulation. In our results there was a total spread of ~1% of total win ratio. The best deck amount with it's best strategy for exploring seems to just barely be 1 deck. This best strategy seemed to be thompson sampling as shown: 
-
-<p align="center">
-  <img src="figures/best_performing_strategy.png" alt="deck convergence's best strats">
-</p>
+We averaged the amount of wins for each deck across all runs. Each deck performed exactly the same. It is apparent that having different amounts of decks does not effect winning chances by typical strategies. Higher amounts of decks are most likely just to discourage card counting, which is considered cheating. These results aren't surprising to us, because each deck count will have the same proportion of all cards.
 
 ### How many decks is most profitable? Which strategy for exploring is best?
 
-The results are all very close, but it seems like using 1 deck may just barely be more profitable overall. This could just be a skew, we may find different results from running for more iterations. The best strategy seems to be thompson sampling, it takes longer to converge, but typically seems to converge at a slightly higher win rate.
+The results are all very close, it seems like the number of decks doesn't effect profitability with typical strategies, but probably make card counting much harder to do. Our plot shows the epsilon greedy e=.4 is the best strategy, however, this is almost certainly an artifact of not doing enough runs, because the win probabilities of each table seem to be exactly the same. Using higher iterations would make each technique converge to closer values, but this would take forever to run, at least on our cpus single-threaded.
