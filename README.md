@@ -110,7 +110,7 @@ If the observation space is extended to include the cards that have not yet been
 
 | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | J  | Q  | K  | A  |
 |----|----|----|----|----|----|----|----|----|----|----|----|----|
-| 51 | 50 | 52 | 52 | 52 | 52 | 52 | 52 | 52 | 51 | 52 | 52 | 51 |
+| 3  | 2  | 4  | 4  | 4  | 4  | 4  | 4  | 4  | 3  | 4  | 4  | 3  |
 
 ### Rewards
 - Win the game: **+1**
