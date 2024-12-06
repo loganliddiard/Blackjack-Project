@@ -26,6 +26,9 @@ pip install numpy scipy matplotlib seaborn
 
 The main python file for submission is `main.py`
 
+While inside the same directory as `main.py` run:
+
+`python main.py`
 
 
 ## Optimal Stop
