@@ -3,6 +3,7 @@
 ## Team Members:
 * Kaden Hart
 * Logan Liddiard
+* Arash Azizian Foumani
 
 
 ## Project Overview
@@ -15,11 +16,11 @@ This project focuses on applying the algorithms focusing on uncertainty across t
 
 ## Requirements:
 
-* Python 3.x
-* Required packages: `numpy`, `scipy`, `matplotlib`, `seaborn`
-These can be installed by running:
+* Python 3.11
+  * Required packages: `numpy`, `scipy`, `matplotlib`, `seaborn`, `stable_baselines3`, `gymnasium`,`tensorboard`
+  These can be installed by running:
 ```
-pip install numpy scipy matplotlib seaborn
+pip install -r requirements.txt
 ```
 
 ## How to run:
@@ -74,3 +75,140 @@ We averaged the amount of wins for each deck across all runs. Each deck performe
 ### How many decks is most profitable? Which strategy for exploring is best?
 
 The results are all very close, it seems like the number of decks doesn't effect profitability with typical strategies, but probably make card counting much harder to do. Our plot shows the epsilon greedy e=.4 is the best strategy, however, this is almost certainly an artifact of not doing enough runs, because the win probabilities of each table seem to be exactly the same. Using higher iterations would make each technique converge to closer values, but this would take forever to run, at least on our cpus single-threaded.
+
+# Reinforcement Learning
+
+We trained A2C and PPO algorithms on two Blackjack environments. In one environment, the agent could only observe its current hand and the dealer's current hand. In the second environment, the agent could also observe the remaining cards in the deck. The goal was to determine whether access to additional information would influence the agent's decisions. The environments were implemented using `gymnasium.Env`.
+
+## Environment details
+### Action Space
+The action space is of shape `(1,)` and includes two possible actions:
+- `0`: Stick
+- `1`: Hit
+
+### Observation Space
+#### Observing Only Player and Dealer Hands (Normal environment)
+The observation space consists of a list of 26 numbers:
+- The first 13 numbers represent the player's hand.
+- The second 13 numbers represent the dealer's hand.
+
+For example, if the player's hand consists of `3 of Hearts`, `3 of Spades`, `2 of Diamonds`, and `Jack of Diamonds`, the first 13 numbers would be:
+
+| 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | J | Q | K | A |
+|---|---|---|---|---|---|---|---|----|---|---|---|---|
+| 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0  | 1 | 0 | 0 | 0 |
+
+If the dealer's hand contains only the `Ace of Hearts`, the second 13 numbers would be:
+
+| 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | J | Q | K | A |
+|---|---|---|---|---|---|---|---|----|---|---|---|---|
+| 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |  0 | 0 | 0 | 0 | 1 |
+
+#### Observing Remaining Cards (Extended environment)
+
+If the observation space is extended to include the cards that have not yet been played, an additional 13 numbers are added. These represent the remaining cards in the deck. For example, if the above hands were dealt from a single deck, the remaining cards would be:
+
+| 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | J  | Q  | K  | A  |
+|----|----|----|----|----|----|----|----|----|----|----|----|----|
+| 51 | 50 | 52 | 52 | 52 | 52 | 52 | 52 | 52 | 51 | 52 | 52 | 51 |
+
+### Rewards
+- Win the game: **+1**
+- Lose the game: **-1**
+- Draw the game: **0**
+
+### Episode Termination
+An episode ends if:
+- The agent hits and the sum of its hand exceeds 21.
+- The agent chooses to stick.
+
+## Training
+Training was conducted for 100,000 iterations.
+
+## Comparison between Algorithms
+
+<p align="center">
+  <img src="figures/rl_average_reward.png" alt="average reward">
+</p>
+
+The graph above shows the average rewards for the last 500 hands played by each algorithm. The faded line represents the raw data, while the darker line represents a smoothed version. 
+
+Some intervals show average rewards exceeding 0, but this is likely due to noise, as the smoothed line never goes above 0. The PPO algorithm achieved a higher average reward (~ -0.1) compared to A2C (~ -0.2). Interestingly, there was no difference observed between the two environments.
+
+This result was surprising, as having access to information about the remaining cards should theoretically provide an advantage (e.g., via card counting). However, this is likely because the environment does not fully implement the rules of Blackjack, such as splits, 1.5x payouts for natural Blackjacks, or betting. If the agent could place bets, it might leverage the extra information and find opportune hands to place large bets and make a profit.
+
+Another potential limitation is the size of the Multi-Layered Perceptron used in `stable_baselines3`, which might not be large enough to utilize the additional information effectively.
+
+
+<p align="center">
+  <img src="figures/rl_loss_rate.png" alt="loss rate">
+</p>
+
+The graph above shows the loss rate for each algorithm. The loss rate for PPO hovers around 50%, while for A2C, it is approximately 57%.
+
+
+<p align="center">
+  <img src="figures/rl_win_rate.png" alt="win rate">
+</p>
+
+The win rate graph indicates that the sum of win and loss rates does not equal 1, as draws are also possible. PPO achieved a win rate of ~42%, compared to ~38% for A2C.
+
+| Algorithm | Average Reward | Win Rate | Loss Rate |
+|-----------|----------------|----------|-----------|
+| A2C       | ~ -0.2         | ~ 38%    | ~ 57%     |
+| PPO       | ~ -0.1         | ~ 42%    | ~ 50%     |
+
+
+## Example of agent (PPO in extended environment) playing 10 hands
+
+
+Below is an example of 10 hands played by a PPO agent in the extended environment. Notably, the agent often refrains from hitting more than once, leading to suboptimal decisions. For instance, in one game, the agent's hand (`[6 of Clubs, 2 of Diamonds, 2 of Hearts]`) is a good hand for hitting, but the agent chose to stick and lost the round. With more training or a more sophisticated model, the algorithms might achieve better results.
+
+```text
+
+------------------------------------------------------
+start | dealer hand: [('10', 'Spades')] | player hand: [('8', 'Hearts'), ('9', 'Clubs')]
+hit   | dealer hand: [('10', 'Spades')] | player hand: [('8', 'Hearts'), ('9', 'Clubs'), ('6', 'Spades')]
+Player lost this round.
+------------------------------------------------------
+start | dealer hand: [('3', 'Diamonds')] | player hand: [('4', 'Clubs'), ('5', 'Diamonds')]
+hit   | dealer hand: [('3', 'Diamonds')] | player hand: [('4', 'Clubs'), ('5', 'Diamonds'), ('K', 'Spades')]
+stand | dealer hand: [('3', 'Diamonds'), ('9', 'Diamonds'), ('2', 'Spades'), ('4', 'Diamonds')] | player hand: [('4', 'Clubs'), ('5', 'Diamonds'), ('K', 'Spades')]
+Player won this round.
+------------------------------------------------------
+start | dealer hand: [('Q', 'Spades')] | player hand: [('3', 'Spades'), ('9', 'Hearts')]
+hit   | dealer hand: [('Q', 'Spades')] | player hand: [('3', 'Spades'), ('9', 'Hearts'), ('A', 'Spades')]
+stand | dealer hand: [('Q', 'Spades'), ('7', 'Diamonds')] | player hand: [('3', 'Spades'), ('9', 'Hearts'), ('A', 'Spades')]
+Player lost this round.
+------------------------------------------------------
+start | dealer hand: [('4', 'Hearts')] | player hand: [('A', 'Hearts'), ('6', 'Hearts')]
+stand | dealer hand: [('4', 'Hearts'), ('Q', 'Diamonds'), ('K', 'Hearts')] | player hand: [('A', 'Hearts'), ('6', 'Hearts')]
+Player won this round.
+------------------------------------------------------
+start | dealer hand: [('K', 'Diamonds')] | player hand: [('8', 'Spades'), ('J', 'Hearts')]
+stand | dealer hand: [('K', 'Diamonds'), ('10', 'Diamonds')] | player hand: [('8', 'Spades'), ('J', 'Hearts')]
+Player lost this round.
+------------------------------------------------------
+start | dealer hand: [('7', 'Spades')] | player hand: [('6', 'Diamonds'), ('8', 'Diamonds')]
+hit   | dealer hand: [('7', 'Spades')] | player hand: [('6', 'Diamonds'), ('8', 'Diamonds'), ('10', 'Hearts')]
+Player lost this round.
+------------------------------------------------------
+start | dealer hand: [('3', 'Clubs')] | player hand: [('6', 'Clubs'), ('2', 'Diamonds')]
+hit   | dealer hand: [('3', 'Clubs')] | player hand: [('6', 'Clubs'), ('2', 'Diamonds'), ('2', 'Hearts')]
+stand | dealer hand: [('3', 'Clubs'), ('A', 'Clubs'), ('3', 'Hearts')] | player hand: [('6', 'Clubs'), ('2', 'Diamonds'), ('2', 'Hearts')]
+Player lost this round.
+------------------------------------------------------
+start | dealer hand: [('Q', 'Hearts')] | player hand: [('J', 'Diamonds'), ('A', 'Diamonds')]
+stand | dealer hand: [('Q', 'Hearts'), ('4', 'Spades'), ('J', 'Clubs')] | player hand: [('J', 'Diamonds'), ('A', 'Diamonds')]
+Player won this round.
+------------------------------------------------------
+start | dealer hand: [('J', 'Spades')] | player hand: [('Q', 'Clubs'), ('8', 'Clubs')]
+hit   | dealer hand: [('J', 'Spades')] | player hand: [('Q', 'Clubs'), ('8', 'Clubs'), ('9', 'Spades')]
+Player lost this round.
+------------------------------------------------------
+start | dealer hand: [('7', 'Hearts')] | player hand: [('5', 'Clubs'), ('K', 'Clubs')]
+hit   | dealer hand: [('7', 'Hearts')] | player hand: [('5', 'Clubs'), ('K', 'Clubs'), ('5', 'Spades')]
+stand | dealer hand: [('7', 'Hearts'), ('Q', 'Diamonds')] | player hand: [('5', 'Clubs'), ('K', 'Clubs'), ('5', 'Spades')]
+Player won this round.
+```
+
